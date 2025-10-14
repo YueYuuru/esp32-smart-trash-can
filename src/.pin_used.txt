@@ -1,0 +1,15 @@
+
+
+
+垃圾桶蓋
+	超音波: trigPin = 11, echoPin = 12
+	伺服馬達: servoPin = 7
+
+垃圾桶燈
+	LED: ledPin = 4
+
+垃圾桶容量(滿度偵測)
+	超音波: trigPin = 13, echoPin = 14
+	
+環境感應器(臭味偵測)
+	I2C: I2C_SDA = 9, I2C_SCL = 10
