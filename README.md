@@ -1,3 +1,5 @@
+<!--偷看個毛線球 又沒什麼好看的-->
+
 # 智慧垃圾桶
 
 這是一個使用 ESP32 的物聯網專題。  
@@ -25,6 +27,20 @@
 
 ---
 
+## 📦 使用的外部程式庫
+
+以下為此專案使用的外部程式庫：
+
+- [`ArduinoJson`](https://github.com/bblanchon/ArduinoJson)
+- [`BME68x Sensor library`](https://github.com/boschsensortec/Bosch-BME68x-Library)
+- [`ESP32Servo`](https://github.com/madhephaestus/ESP32Servo)
+- [`FirebaseClient`](https://github.com/mobizt/FirebaseClient)
+- [`WebSockets`](https://github.com/Links2004/arduinoWebSockets)
+- [`bsec2`](https://github.com/boschsensortec/Bosch-BSEC2-Library)
+
+
+---
+
 ## 🚀 安裝與建置
 
 1. **Clone 專案**
@@ -44,7 +60,7 @@ cd esp32-smart-trash-can
 cp docs/ProjectConfig.example.cpp src/ProjectConfig.cpp
 ```
 
-並編輯該檔案，填入你的 WiFi、資料庫與 API 設定。
+並編輯該檔案，填入你的 WiFi、資料庫等設定。
 
 ---
 
@@ -57,8 +73,8 @@ cp docs/ProjectConfig.example.cpp src/ProjectConfig.cpp
 ## 📁 專案結構（簡要）
 
 ```
-esp32-smart-trash-can/
-├── src/
+esp32-smart-trash-can
+├── src
 │   ├── .pin_used.txt               # 開發板腳位使用紀錄
 │   ├── bsec_iaq.cfg                # BME680 環境感測器的 BESC 設定檔案
 │   ├── SmartTrashCan.ino           # 主程式
@@ -89,4 +105,4 @@ esp32-smart-trash-can/
 
 MIT License
 
----
+
