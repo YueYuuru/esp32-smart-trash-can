@@ -1,3 +1,5 @@
+#include <string>
+#include <vector>
 
 
 #ifndef SMARTTRASHCAN_DATABASECLIENT_H
@@ -22,6 +24,8 @@ class DatabaseClient {
 		void loop();
 		RealtimeDatabase& getRealtimeDatabase();
 		AsyncClient& getAsyncClient();
+
+		void handleSerialCommands(std::vector<std::string> commands);
 
 	private:
 		DatabaseClient();

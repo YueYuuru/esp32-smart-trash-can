@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include <string>
 #include <vector>
 #include <WebSocketsServer.h>
 
@@ -44,6 +44,8 @@ void task_trashCanLight(void * parameter);
 void task_trashCanLid(void * parameter);
 void task_trashCanCapacity(void * parameter);
 void task_environmentalSensor(void * parameter);
+
+const std::vector<std::string> split(const std::string& str, const std::string& pattern);
 
 
 void setup() {
@@ -94,22 +96,55 @@ void loop() {
 	customWebSocketServer.loop();
 
 
-	/*
-	String serialMessage = "";
-	while (Serial.available() > 0) {
-		serialMessage = serialMessage + Serial.readString();
-	}
-	if (serialMessage != "") {
-		Serial.println(serialMessage);
+	if (Serial.available()) {
+		String inputString = Serial.readStringUntil('\n');
+		inputString.trim();
 
-		if (serialMessage == "test.websocket.sendMsg") {
-			for (uint8_t id : clients) {
-				webSocket.sendTXT(id, "Hello from ESP32 Websocket Server! # 這是一條測試訊息 來自ESP32 !!!!");
-			}
+		Serial.printf("輸入: %s\n", inputString);
+		std::vector<std::string> command = split(inputString.c_str(), ".");
+
+		if (inputString == "help") {
+			Serial.printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+				"可用指令:",
+				"help - 顯示此說明",
+				"database.resetListener - 重新設置資料庫更新監聽",
+				"envSensor.reset - 重設校準",
+				"envSensor.status - 檢視當前狀態",
+				"envSensor.calibrate - 重新校準",
+				"envSensor.threshold - 顯示臭味閾值",
+				"envSensor.weights - 顯示融合權重",
+				"envSensor.help - 顯示說明"
+			);
+		}
+
+		if (command[0] == "database") {
+			databaseClient.handleSerialCommands(command);
+		}
+
+		if (command[0] == "envSensor") {
+			environmentalSensor.handleSerialCommands(command);
 		}
 	}
-	*/
+}
 
+
+const std::vector<std::string> split(const std::string& str, const std::string& pattern) {
+    std::vector<std::string> result;
+    std::string::size_type end = str.find(pattern);
+    std::string::size_type begin = 0;
+
+    while (end != std::string::npos) {
+        if (end - begin != 0) {
+            result.push_back(str.substr(begin, end-begin)); 
+        }    
+        begin = end + pattern.size();
+        end = str.find(pattern, begin);
+    }
+
+    if (begin != str.length()) {
+        result.push_back(str.substr(begin));
+    }
+    return result;        
 }
 
 

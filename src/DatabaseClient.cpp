@@ -1,3 +1,6 @@
+#include <Arduino.h>
+#include <string>
+#include <vector>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
@@ -85,24 +88,17 @@ void DatabaseClient::loop() {
 		databaseSetListener = true;
 
 		// Database.set<boolean_t>(async_client, "data/state/light", boolean_t(false)); // 客戶端 路徑 值
-
+		
 		Database.get(async_client, "data/state", processData, true); // 客戶端 路徑 呼叫處理資料的函數或給予數值給該變數 使用stream
 	}
+}
 
-	/*
-	String serialMessage = "";
-	while (Serial.available() > 0) {
-		serialMessage = serialMessage + Serial.read();
-	}
-	if (serialMessage != "") {
-		Serial.println(serialMessage);
+void DatabaseClient::handleSerialCommands(std::vector<std::string> commands) {
+	String command = String((commands[1]).c_str());
 
-		if (serialMessage == "test.databaseListener.reset") {
-			databaseSetListener = false;
-		}
+	if (command == "resetListener") {
+		databaseSetListener = false;
 	}
-	*/
-	
 }
 
 void processData(AsyncResult &asyncResult) {

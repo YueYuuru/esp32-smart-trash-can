@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <string>
+#include <vector>
 #include <Wire.h>
 #include <bsec2.h>
 #include <Preferences.h>
@@ -24,7 +26,6 @@ Preferences preferences;
 bool initSensor();
 void processSensorData();
 void checkSensorStatus();
-void handleSerialCommands();
 void loadCalibrationState();
 void saveState();
 void printCalibrationAdvice();
@@ -181,7 +182,6 @@ void EnvironmentalSensor::loop() {
 		checkSensorStatus();
 	}
 
-	handleSerialCommands();
 	vTaskDelay(pdMS_TO_TICKS(100));
 }
 
@@ -563,53 +563,52 @@ void saveState() {
 	free(state);
 }
 
-void handleSerialCommands() {
-	if (Serial.available()) {
-		String command = Serial.readStringUntil('\n');
-		command.trim();
-		
-		if (command == "reset") {
-			preferences.remove("bsec_state");
-			Serial.println("校準已重設 請重啟裝置");
-		} else if (command == "status") {
-			if (outputs) {
-				Serial.println("=== 當前感測器狀態 ===");
-				// 取得IAQ精度
-				uint8_t iaqAccuracy = 0;
-				for (int i = 0; i < outputs -> nOutputs; i++) {
-					if (outputs -> output[i].sensor_id == BSEC_OUTPUT_IAQ) {
-						iaqAccuracy = outputs -> output[i].accuracy;
-						break;
-					}
+void EnvironmentalSensor::handleSerialCommands(std::vector<std::string> commands) {
+	String command = String((commands[1]).c_str());
+	
+	if (command == "reset") {
+		preferences.remove("bsec_state");
+		Serial.println("校準已重設 請重啟裝置");
+	} else if (command == "status") {
+		if (outputs) {
+			Serial.println("=== 當前感測器狀態 ===");
+			// 取得IAQ精度
+			uint8_t iaqAccuracy = 0;
+			for (int i = 0; i < outputs -> nOutputs; i++) {
+				if (outputs -> output[i].sensor_id == BSEC_OUTPUT_IAQ) {
+					iaqAccuracy = outputs -> output[i].accuracy;
+					break;
 				}
-
-				Serial.printf("IAQ精度: %d/3  目前VOCs: %.3f ppm  當前氣體電阻: %.2f Ω  氣體百分比: %.1f  基線氣體電阻: %.2f  校準狀態: %s  臭味警報: %s \n",
-					iaqAccuracy,
-					getOutputSignal(BSEC_OUTPUT_BREATH_VOC_EQUIVALENT),
-					getOutputSignal(BSEC_OUTPUT_RAW_GAS),
-					getOutputSignal(BSEC_OUTPUT_GAS_PERCENTAGE),
-					baselineGasResistance,
-					(baselineValid ? "有效" : "無效"), (odorAlertActive ? "啟動中" : "未啟動")
-				);
-			} else {
-				Serial.println("無有效資料");
 			}
-		} else if (command == "calibrate") {
-			calibrateBaseline();
-			Serial.println("重新開始校準過程");
-		} else if (command == "threshold") {
-			Serial.printf("當前臭味閾值: VOCs > %.1f ppm  氣體電阻: %f Ω \n", ODOR_THRESHOLD, RAW_GAS_THRESHOLD);
-		} else if (command == "weights") {
-			Serial.printf("當前融合權重:\nVOCs 權重: %f  氣體電阻權重: %f  IAQ 權重: %f \n", VOC_WEIGHT, GAS_RES_WEIGHT, IAQ_WEIGHT);
-		} else if (command == "help") {
-			Serial.println("可用指令:");
-			Serial.println("reset - 重設校準");
-			Serial.println("status - 檢視當前狀態");
-			Serial.println("calibrate - 重新校準");
-			Serial.println("threshold - 顯示臭味閾值");
-			Serial.println("weights - 顯示融合權重");
-			Serial.println("help - 顯示說明");
+
+			Serial.printf("IAQ精度: %d/3  目前VOCs: %.3f ppm  當前氣體電阻: %.2f Ω  氣體百分比: %.1f  基線氣體電阻: %.2f  校準狀態: %s  臭味警報: %s \n",
+				iaqAccuracy,
+				getOutputSignal(BSEC_OUTPUT_BREATH_VOC_EQUIVALENT),
+				getOutputSignal(BSEC_OUTPUT_RAW_GAS),
+				getOutputSignal(BSEC_OUTPUT_GAS_PERCENTAGE),
+				baselineGasResistance,
+				(baselineValid ? "有效" : "無效"), (odorAlertActive ? "啟動中" : "未啟動")
+			);
+		} else {
+			Serial.println("無有效資料");
 		}
+	} else if (command == "calibrate") {
+		calibrateBaseline();
+		Serial.println("重新開始校準過程");
+	} else if (command == "threshold") {
+		Serial.printf("當前臭味閾值: VOCs > %.1f ppm  氣體電阻: %f Ω \n", ODOR_THRESHOLD, RAW_GAS_THRESHOLD);
+	} else if (command == "weights") {
+		Serial.printf("當前融合權重:\nVOCs 權重: %f  氣體電阻權重: %f  IAQ 權重: %f \n", VOC_WEIGHT, GAS_RES_WEIGHT, IAQ_WEIGHT);
+	} else if (command == "help") {
+		Serial.printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+			"可用指令:",
+			"envSensor.reset - 重設校準",
+			"envSensor.status - 檢視當前狀態",
+			"envSensor.calibrate - 重新校準",
+			"envSensor.threshold - 顯示臭味閾值",
+			"envSensor.weights - 顯示融合權重",
+			"envSensor.help - 顯示說明"
+		);
 	}
 }
 

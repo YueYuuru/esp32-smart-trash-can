@@ -1,3 +1,5 @@
+#include <string>
+#include <vector>
 
 
 #ifndef SMARTTRASHCAN_ENVIRONMENTALSENSOR_H
@@ -11,6 +13,8 @@ class EnvironmentalSensor {
 
         void setup();
         void loop();
+
+		void handleSerialCommands(std::vector<std::string> commands);
 
     private:
 		EnvironmentalSensor();
