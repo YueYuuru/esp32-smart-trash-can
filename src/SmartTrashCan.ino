@@ -109,11 +109,11 @@ void loop() {
 			);
 		}
 
-		if (command[0] == "database") {
+		if (command[0] == "database" && command.size() >= 2) {
 			databaseClient.handleSerialCommands(command);
 		}
 
-		if (command[0] == "envSensor") {
+		if (command[0] == "envSensor" && command.size() >= 2) {
 			environmentalSensor.handleSerialCommands(command);
 		}
 	}
