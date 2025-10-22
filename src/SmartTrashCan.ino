@@ -39,6 +39,8 @@ TaskHandle_t taskHandle_environmentalSensor;
 RealtimeDatabase database;
 
 
+void taskInit();
+
 void task_databaseClient(void * parameter);
 void task_trashCanLight(void * parameter);
 void task_trashCanLid(void * parameter);
@@ -49,12 +51,20 @@ const std::vector<std::string> split(const std::string& str, const std::string& 
 
 
 void setup() {
+	delay(5000);  // 等個5秒 等你開好序列監視器 :D
 	Serial.begin(115200);
 	Serial.println("初始化");
 	Serial.println();
 
+	// 連接 Wifi
+	wifiConnect.setup();
 
-	// 建立任務 (還不會執行)
+	// 自訂 WebSocketServer
+	customWebSocketServer.setup();
+
+	delay(1000);
+
+	// 建立任務
 	// xTaskCreate(<任務函式>, <任務名稱>, <堆疊大小(words)>, <傳入參數>, <優先權(1~5)>, <任務句柄>);
 	xTaskCreate(task_databaseClient, "databaseClient", 16384, NULL, 1, &taskHandle_databaseClient);
 	xTaskCreate(task_trashCanLight, "trashCanLight", 2048, NULL, 1, &taskHandle_trashCanLight);
@@ -62,25 +72,8 @@ void setup() {
 	xTaskCreate(task_trashCanCapacity, "trashCanCapacity", 4096, NULL, 1, &taskHandle_trashCanCapacity);
 	xTaskCreate(task_environmentalSensor, "environmentalSensor", 16384, NULL, 1, &taskHandle_environmentalSensor);
 
-
-	// 連接 Wifi
-	wifiConnect.setup();
-
-	// 資料庫
-	databaseClient.setup();
-	database = databaseClient.getRealtimeDatabase();
-
-	// 自訂 WebSocketServer
-	customWebSocketServer.setup();
-
-	// 垃圾桶燈
-	trashCanLight.setup();
-
-	// 垃圾桶蓋
-	trashCanLid.setup();
-
-	// 垃圾桶容量
-	trashCanCapacity.setup();
+	// 任務初始化
+	taskInit();
 
 	// 開始任務
 	vTaskResume(taskHandle_databaseClient);
@@ -91,6 +84,7 @@ void setup() {
 
 	Serial.println();
 	Serial.println("初始化完成");
+	Serial.println();
 }
 
 
@@ -146,57 +140,92 @@ const std::vector<std::string> split(const std::string& str, const std::string& 
 }
 
 
+void taskInit() {
+	vTaskResume(taskHandle_databaseClient);
+	delay(100);
+	vTaskResume(taskHandle_trashCanLight);
+	vTaskResume(taskHandle_trashCanLid);
+	vTaskResume(taskHandle_trashCanCapacity);
+	delay(100);
+	vTaskResume(taskHandle_environmentalSensor);
+
+	// 等待環境感測器初始化完成(不管成功或失敗)
+	while (environmentalSensor.isAvailable() == -1) {
+		delay(10);
+	}
+}
+
+
 void task_databaseClient(void * parameter) {
-	// 資料庫
 	vTaskSuspend(taskHandle_databaseClient);
 
-	while(true) {
+	// 資料庫
+	databaseClient.setup();
+	database = databaseClient.getRealtimeDatabase();
+
+	vTaskSuspend(taskHandle_databaseClient);
+
+	while(databaseClient.isAvailable()) {
 		databaseClient.loop();
 		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 }
 
 void task_trashCanLight(void * parameter) {
+	vTaskSuspend(taskHandle_trashCanLight);
+	
 	// 垃圾桶燈
+	trashCanLight.setup();
+
 	vTaskSuspend(taskHandle_trashCanLight);
 
-	while (true) {
+	while (trashCanLight.isAvailable()) {
 		trashCanLight.loop();
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
 }
 
 void task_trashCanLid(void * parameter) {
+	vTaskSuspend(taskHandle_trashCanLid);
+	
 	// 垃圾桶蓋
+	trashCanLid.setup();
+
 	vTaskSuspend(taskHandle_trashCanLid);
 
-	while (true) {
+	while (trashCanLid.isAvailable()) {
 		trashCanLid.loop();
 		// 不用延遲(已經寫在loop裡)
 	}
 }
 
 void task_trashCanCapacity(void * parameter) {
-	// 垃圾桶容量
 	vTaskSuspend(taskHandle_trashCanCapacity);
 
-	while (true) {
+	// 垃圾桶容量
+	trashCanCapacity.setup();
+
+	vTaskSuspend(taskHandle_trashCanCapacity);
+
+	while (trashCanCapacity.isAvailable()) {
 		trashCanCapacity.loop();
 		// 不用延遲(已經寫在loop裡)
 	}
 }
 
 void task_environmentalSensor(void * parameter) {
+	vTaskSuspend(taskHandle_environmentalSensor);
+	
 	// 環境感應器
+	environmentalSensor.setup();
+
 	vTaskSuspend(taskHandle_environmentalSensor);
 
-	// 環境感應器
-	if (environmentalSensor.setup()) {
-		while (true) {
-			environmentalSensor.loop();
-			// 不用延遲(已經寫在loop裡)
-		}
+	while (environmentalSensor.isAvailable() == 0) {
+		environmentalSensor.loop();
+		// 不用延遲(已經寫在loop裡)
 	}
+	
 	vTaskDelete(NULL);
 }
 

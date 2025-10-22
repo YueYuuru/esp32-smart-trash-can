@@ -11,12 +11,17 @@ class TrashCanLid {
 
         void setup();
         void loop();
+
+		bool isAvailable();
+		
         void setOpen(bool enable);
 
     private:
 		TrashCanLid();
 		TrashCanLid(const TrashCanLid&) = delete;
 		TrashCanLid& operator=(const TrashCanLid&) = delete;
+
+		bool available = false;
 
         bool enable;
 };

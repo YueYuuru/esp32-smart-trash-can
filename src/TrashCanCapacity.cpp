@@ -27,8 +27,12 @@ TrashCanCapacity& TrashCanCapacity::getInstance() {
 TrashCanCapacity& trashCanCapacity = TrashCanCapacity::getInstance();    // 垃圾桶容量
 
 void TrashCanCapacity::setup() {
+	Serial.println("初始化 - 垃圾桶容量");
+
 	pinMode(trigPin, OUTPUT);      // 設定觸發腳為輸出
 	pinMode(echoPin, INPUT);       // 設定回波腳為輸入
+
+	available = true;
 }
 
 
@@ -63,4 +67,8 @@ void TrashCanCapacity::loop() {
 	}
 
 	vTaskDelay(pdMS_TO_TICKS(1000));    // 每秒測量一次
+}
+
+bool TrashCanCapacity::isAvailable() {
+	return available;
 }

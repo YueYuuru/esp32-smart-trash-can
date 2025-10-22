@@ -12,10 +12,14 @@ class CustomWebSocketServer {
         void setup();
         void loop();
 
+		bool isAvailable();
+
     private:
 		CustomWebSocketServer();
 		CustomWebSocketServer(const CustomWebSocketServer&) = delete;
 		CustomWebSocketServer& operator=(const CustomWebSocketServer&) = delete;
+
+		bool available = false;
 };
 
 extern CustomWebSocketServer& customWebSocketServer;

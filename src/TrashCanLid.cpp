@@ -76,6 +76,8 @@ void closeLid() {
 
 
 void TrashCanLid::setup() {
+	Serial.println("初始化 - 垃圾桶蓋");
+
 	pinMode(trigPin, OUTPUT);
 	pinMode(echoPin, INPUT);
 
@@ -86,6 +88,8 @@ void TrashCanLid::setup() {
 	enable = false;
 	objectCleared = false;
 	lock = false;
+
+	available = true;
 }
 
 void TrashCanLid::loop() {
@@ -130,6 +134,10 @@ void TrashCanLid::loop() {
 	}
 
 	vTaskDelay(pdMS_TO_TICKS(100)); // 迴圈延遲
+}
+
+bool TrashCanLid::isAvailable() {
+	return available;
 }
 
 void TrashCanLid::setOpen(bool enable_) {

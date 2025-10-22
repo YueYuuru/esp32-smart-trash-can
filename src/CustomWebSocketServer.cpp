@@ -29,17 +29,25 @@ CustomWebSocketServer& CustomWebSocketServer::getInstance() {
 CustomWebSocketServer& customWebSocketServer = CustomWebSocketServer::getInstance();    // WebSocket 伺服器
 
 void CustomWebSocketServer::setup() {
+	Serial.println("初始化 - WebSocketClient");
+
 	// 啟動 WebSocket 伺服器
 	webSocket.begin();
 
 	// 伺服器事件
 	webSocket.onEvent(webSocketEvent);
+	
+	available = true;
 }
 
 
 void CustomWebSocketServer::loop() {
     // 每個循環要處理 WebSocket 的事件
 	webSocket.loop();
+}
+
+bool CustomWebSocketServer::isAvailable() {
+	return available;
 }
 
 

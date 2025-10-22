@@ -11,8 +11,10 @@ class EnvironmentalSensor {
     public:
 		static EnvironmentalSensor& getInstance();
 
-        bool setup();
+        void setup();
         void loop();
+
+		int isAvailable();
 
 		void handleSerialCommands(std::vector<std::string> commands);
 
@@ -20,6 +22,8 @@ class EnvironmentalSensor {
 		EnvironmentalSensor();
 		EnvironmentalSensor(const EnvironmentalSensor&) = delete;
 		EnvironmentalSensor& operator=(const EnvironmentalSensor&) = delete;
+
+		int available = -1;
 };
 
 extern EnvironmentalSensor& environmentalSensor;

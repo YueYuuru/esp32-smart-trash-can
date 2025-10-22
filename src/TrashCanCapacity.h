@@ -12,10 +12,14 @@ class TrashCanCapacity {
         void setup();
         void loop();
 
+		bool isAvailable();
+
     private:
 		TrashCanCapacity();
 		TrashCanCapacity(const TrashCanCapacity&) = delete;
 		TrashCanCapacity& operator=(const TrashCanCapacity&) = delete;
+
+		bool available = false;
 };
 
 extern TrashCanCapacity& trashCanCapacity;

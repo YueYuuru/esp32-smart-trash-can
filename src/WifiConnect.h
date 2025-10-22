@@ -12,10 +12,14 @@ class WifiConnect {
         void setup();
         void loop();
 
+		bool isAvailable();
+
     private:
         WifiConnect();
 		WifiConnect(const WifiConnect&) = delete;
 		WifiConnect& operator=(const WifiConnect&) = delete;
+
+		bool available = false;
 };
 
 extern WifiConnect& wifiConnect;

@@ -58,6 +58,7 @@ DatabaseClient& DatabaseClient::getInstance() {
 DatabaseClient& databaseClient = DatabaseClient::getInstance();    // 資料庫
 
 void DatabaseClient::setup() {
+	Serial.println("初始化 - 資料庫");
 
 	ssl_client.setInsecure();
 
@@ -65,11 +66,13 @@ void DatabaseClient::setup() {
 	ssl_client.setHandshakeTimeout(5);
 
 
-	initializeApp(async_client, app, getAuth(user_auth), processData_initializeApp, "authTask");
+	initializeApp(async_client, app, getAuth(user_auth), processData_initializeApp, "授權任務(authTask)");
 
 	app.getApp<RealtimeDatabase>(Database);
 
 	Database.url(ProjectConfig::DATABASE_URL);
+	
+	available = true;
 }
 
 RealtimeDatabase& DatabaseClient::getRealtimeDatabase() {
@@ -91,6 +94,10 @@ void DatabaseClient::loop() {
 		
 		Database.get(async_client, "data/state", processData, true); // 客戶端 路徑 呼叫處理資料的函數或給予數值給該變數 使用stream
 	}
+}
+
+bool DatabaseClient::isAvailable() {
+	return available;
 }
 
 void DatabaseClient::handleSerialCommands(std::vector<std::string> commands) {

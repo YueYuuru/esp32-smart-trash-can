@@ -22,6 +22,9 @@ class DatabaseClient {
 
 		void setup();
 		void loop();
+
+		bool isAvailable();
+
 		RealtimeDatabase& getRealtimeDatabase();
 		AsyncClient& getAsyncClient();
 
@@ -31,6 +34,8 @@ class DatabaseClient {
 		DatabaseClient();
 		DatabaseClient(const DatabaseClient&) = delete;
 		DatabaseClient& operator=(const DatabaseClient&) = delete;
+
+		bool available = false;
 };
 
 extern DatabaseClient& databaseClient;

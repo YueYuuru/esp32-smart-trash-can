@@ -25,6 +25,8 @@ WifiConnect& WifiConnect::getInstance() {
 WifiConnect& wifiConnect = WifiConnect::getInstance();    // Wifi
 
 void WifiConnect::setup() {
+	Serial.println("初始化 - Wifi");
+
 	// 連接WiFi
 	WiFi.begin(ProjectConfig::WIFI_SSID, ProjectConfig::WIFI_PASSWORD);
 
@@ -42,8 +44,9 @@ void WifiConnect::setup() {
 	Serial.println(WiFi.localIP());
 
 	writeIpAddress = false;
-}
 
+	available = true;
+}
 
 void WifiConnect::loop() {
 	
@@ -52,5 +55,9 @@ void WifiConnect::loop() {
 		writeIpAddress = true;
 	}
     
+}
+
+bool WifiConnect::isAvailable() {
+	return available;
 }
 

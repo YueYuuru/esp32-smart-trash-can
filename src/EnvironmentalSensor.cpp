@@ -1220,8 +1220,9 @@ EnvironmentalSensor& EnvironmentalSensor::getInstance() {
 
 EnvironmentalSensor& environmentalSensor = EnvironmentalSensor::getInstance();
 
-bool EnvironmentalSensor::setup() {
-	
+void EnvironmentalSensor::setup() {
+	Serial.println("初始化 - 環境感測器");
+
 	Serial.println("=== 垃圾桶臭味偵測系統 ===");
 	Serial.println("版本: 1.25 | 基準值修復版");
 	
@@ -1243,7 +1244,8 @@ bool EnvironmentalSensor::setup() {
 	if (!initSensor()) {
 		Serial.println("感測器初始化失敗!");
 		//while (true);  // 初始化失敗 停止程式
-		return false;
+		available = 1;
+		return;
 	}
 	
 	Serial.println("BME680 初始化成功!");
@@ -1259,7 +1261,7 @@ bool EnvironmentalSensor::setup() {
 		startCalibration(CALIB_MODE_FULL);
 		autoCalibrationInProgress = true;  // 標記為自動校正
 	}
-	return true;
+	available = 0;
 }
 
 
@@ -1341,6 +1343,10 @@ void EnvironmentalSensor::loop() {
 	}
 	
 	vTaskDelay(pdMS_TO_TICKS(10));  // 短暫延遲 減少CPU負載
+}
+
+int EnvironmentalSensor::isAvailable() {
+	return available;
 }
 
 void EnvironmentalSensor::handleSerialCommands(std::vector<std::string> commands) {
