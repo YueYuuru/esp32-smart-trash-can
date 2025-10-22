@@ -50,7 +50,7 @@ void TrashCanCapacity::loop() {
 	float trashHeight = maxHeight - distance;
 
 	// 顯示結果
-	Serial.printf("感測器距離: %s cm | 垃圾高度: %s cm\n", distance, trashHeight);
+	Serial.printf("感測器距離: %.2f cm | 垃圾高度: %.2f cm\n", distance, trashHeight);
 
 	// 垃圾桶狀態判斷
 	if (trashHeight >= maxHeight * 0.8) {  // 超過 80% 容量
