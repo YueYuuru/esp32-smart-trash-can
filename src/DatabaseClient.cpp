@@ -88,11 +88,14 @@ void DatabaseClient::loop() {
 	app.loop();
 
 	if (app.ready() && !databaseSetListener) {
+		Serial.println("設置資料庫更新監聽");
+
 		databaseSetListener = true;
 
 		// Database.set<boolean_t>(async_client, "data/state/light", boolean_t(false)); // 客戶端 路徑 值
 		
 		Database.get(async_client, "data/state", processData, true); // 客戶端 路徑 呼叫處理資料的函數或給予數值給該變數 使用stream
+		Serial.println("資料庫更新監聽設置完成");
 	}
 }
 
@@ -104,6 +107,7 @@ void DatabaseClient::handleSerialCommands(std::vector<std::string> commands) {
 	String command = String((commands[1]).c_str());
 
 	if (command == "resetListener") {
+		Serial.println("重新設置資料庫更新監聽");
 		databaseSetListener = false;
 	}
 }
