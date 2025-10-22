@@ -11,7 +11,7 @@ class EnvironmentalSensor {
     public:
 		static EnvironmentalSensor& getInstance();
 
-        void setup();
+        bool setup();
         void loop();
 
 		void handleSerialCommands(std::vector<std::string> commands);

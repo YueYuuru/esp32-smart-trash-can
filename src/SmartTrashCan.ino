@@ -82,10 +82,6 @@ void setup() {
 	// 垃圾桶容量
 	trashCanCapacity.setup();
 
-	// 環境感應器
-	environmentalSensor.setup();
-
-
 	// 開始任務
 	vTaskResume(taskHandle_databaseClient);
 	vTaskResume(taskHandle_trashCanLight);
@@ -111,15 +107,10 @@ void loop() {
 		std::vector<std::string> command = split(inputString.c_str(), ".");
 
 		if (inputString == "help") {
-			Serial.printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+			Serial.printf("%s\n%s\n%s\n%s\n",
 				"可用指令:",
 				"help - 顯示此說明",
 				"database.resetListener - 重新設置資料庫更新監聽",
-				"envSensor.reset - 重設校準",
-				"envSensor.status - 檢視當前狀態",
-				"envSensor.calibrate - 重新校準",
-				"envSensor.threshold - 顯示臭味閾值",
-				"envSensor.weights - 顯示融合權重",
 				"envSensor.help - 顯示說明"
 			);
 		}
@@ -161,6 +152,7 @@ void task_databaseClient(void * parameter) {
 
 	while(true) {
 		databaseClient.loop();
+		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 }
 
@@ -198,10 +190,14 @@ void task_environmentalSensor(void * parameter) {
 	// 環境感應器
 	vTaskSuspend(taskHandle_environmentalSensor);
 
-	while (true) {
-		environmentalSensor.loop();
-		// 不用延遲(已經寫在loop裡)
+	// 環境感應器
+	if (environmentalSensor.setup()) {
+		while (true) {
+			environmentalSensor.loop();
+			// 不用延遲(已經寫在loop裡)
+		}
 	}
+	vTaskDelete(NULL);
 }
 
 
